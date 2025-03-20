@@ -2,28 +2,33 @@ import os
 import argparse
 
 import numpy.random as rnd
-from operators import destroy_1, repair_1
-from psp import PSP, Parser
+# from operators import destroy_1, repair_1
+from rcjsp import JSP, Parser
 from src.alns import ALNS
 from src.alns.criteria import *
 from src.helper import save_output
 from src.settings import DATA_PATH
-
+import sys
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='load data')
-    parser.add_argument(dest='data', type=str, help='data')
+    parser.add_argument(dest='attraction_data', type=str, help='attraction data')
+    parser.add_argument(dest='tourist_data', type=str, help='tourist data')
     parser.add_argument(dest='seed', type=int, help='seed')
     args = parser.parse_args()
     
     # instance file and random seed
-    json_file = args.data
+    tourist_loc = args.tourist_data
+    attraction_loc = args.attraction_data
     seed = int(args.seed)
     
     # load data and random seed
-    parsed = Parser(json_file)
-    psp = PSP(parsed.name, parsed.workers, parsed.tasks, parsed.Alpha)
+    parsed = Parser(attraction_loc, tourist_loc)
+
+    sys.exit()
+
+    psp = JSP(parsed.tourists, parsed.attractions)
 
     # construct random initialized solution
     psp.random_initialize(seed)
