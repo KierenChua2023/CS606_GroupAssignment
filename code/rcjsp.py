@@ -67,9 +67,9 @@ class Tourist(object):
         self.money_spent = 0
 
         # Available free time
-        self.remaining_time = {}
+        self.touring_dict = {}
         for i in range(self.days):
-            self.remaining_time[i] = self.touring_hours
+            self.touring_dict[i] = self.touring_hours
 
         # Format is key is day, then inside is list of Attraction Class
         # e.g. {1: ["Marina Bay", "Lau Par Sat"], 2: ["Lakeside Park"]}
@@ -80,6 +80,9 @@ class Tourist(object):
         # another dicitonary which contains the locations and the start time of visit
         # e.g. {1: {"Marina Bay": 8.5, "Lau Par Sat": 13}, 2: {"Lakeside Park": 7}} etc.
         self.start_times = {}
+
+        # This list contain the list of visited locations 
+        self.visited = []
 
 
     def can_assign(self, attraction : Attraction, time : int, day : int) -> bool:
@@ -93,10 +96,10 @@ class Tourist(object):
         
         # End time cannot be later than end of touring hours or 
         # Start time cannot be earlier as start of touring hours
-        if time < self.touring_hours[0]:
+        if time < self.touring_dict[day][0]:
             return False
-        if time + attraction.task_time > self.touring_hours[1]:
-            return True
+        if time + attraction.task_time > self.touring_dict[day][1]:
+            return False
         
         # 3 activities per day max
         if self.locations[day] >= 3:
@@ -323,7 +326,7 @@ class SMJSP(State):
         self.solution = []
         self.unassigned = list(attractions)
 
-    def random_initialize(self, seed=None):
+    def random_initialize(self, seed=None) -> float:
         """
         Args:
             seed::int
@@ -351,6 +354,7 @@ class SMJSP(State):
         return copy.deepcopy(self)
 
     def objective(self):
+        # TODO : Make a probably metric here IMPORTANT
         """Calculate the objective value of the state
         Return the total cost of each worker + unassigned cost
         """
