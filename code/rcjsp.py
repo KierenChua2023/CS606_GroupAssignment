@@ -66,6 +66,11 @@ class Tourist(object):
         # Create lists and dict to hold items
         self.money_spent = 0
 
+        # Available free time
+        self.remaining_time = {}
+        for i in range(self.days):
+            self.remaining_time[i] = self.touring_hours
+
         # Format is key is day, then inside is list of Attraction Class
         # e.g. {1: ["Marina Bay", "Lau Par Sat"], 2: ["Lakeside Park"]}
         # names used for convention, but we keep track of tasks for better lookup
@@ -74,65 +79,60 @@ class Tourist(object):
         # Format is key is day, then within the visiting there is 
         # another dicitonary which contains the locations and the start time of visit
         # e.g. {1: {"Marina Bay": 8.5, "Lau Par Sat": 13}, 2: {"Lakeside Park": 7}} etc.
-        self.visting = {}
+        self.start_times = {}
 
 
-    def calculate_available_time(self, day : int) -> list:
+    def can_assign(self, attraction : Attraction, time : int, day : int) -> bool:
         """
-        Calculate the time available for the day given the attractions for the day
-        returns list of tuples containing the blocks of available time
-        """
-        init_time = self.touring_hours
-
-        # If no activities for the day, then whole day available
-        if day not in self.visting.keys():
-            return [init_time]
-        
-        else:
-            times_for_day = self.visting[day]
-            tasks_for_day = self.locations[day]
-
-            used_time_blocks = []
-
-            for key, value in times_for_day:
-                # Lookup the task in tasks for day
-                cur_task = None
-                for task in tasks_for_day:
-                    if task.attraction_name == key:
-                        cur_task = task
-                        break
-                
-                # Calculate the blocks within that day
-                time_block = [value, value + cur_task.task_time]
-                used_time_blocks.append(time_block)
-
-            # We then calculate the avaible time blocks from unavailable time
-
-        return []
-
-
-
-
-    def can_assign(self, attraction : Attraction) -> bool:
-        """
-        Check whether you can assign the attraction to the tourist
+        Check whether you can assign the attraction to the tourist when he visits
+        at a given time at a given day
         """
         # Cannot exceed Budget
         if attraction.cost + self.money_spent > self.budget:
             return False
         
+        # End time cannot be later than end of touring hours or 
+        # Start time cannot be earlier as start of touring hours
+        if time < self.touring_hours[0]:
+            return False
+        if time + attraction.task_time > self.touring_hours[1]:
+            return True
+        
         # 3 activities per day max
-        
-        # At least 2 hour breaks between activities 
-        
-        # TODO Must visit location
+        if self.locations[day] >= 3:
+            return False
 
         # Visitors must visit during visiting hours  
-        time_for_day = self.touring_hours
+        if day not in attraction.opening_hours.keys():
+            return False
+        else:
+            cur_opening_hours = attraction.opening_hours[day]
+            # too early
+            if time < cur_opening_hours[0]:
+                return False
+            
+            # too late
+            if time + attraction.task_time > cur_opening_hours[1]:
+                return False
 
-        
+        # Make the time blocks, the add in the new task at specific time and sort 
+        used_time = []
+        cur_day_activities = self.locations
+        cur_day_start_times = self.start_times
 
+        for activity in cur_day_activities:
+            start_time = cur_day_start_times[activity.attraction_name]
+            used_time.append([start_time, start_time + activity.task_time])
+
+        # Sort by start times
+        used_time.append([time, time + attraction.task_time])
+        used_time = sorted(used_time, key = lambda x : x[0])
+
+        # At least 2 hour breaks between activities
         # Activities cannot overlap 
+        for i in range(len(used_time) - 1):
+            if used_time[i][1] + 2 > used_time[i+1][0]:
+                return False
 
         return True
     
@@ -140,7 +140,17 @@ class Tourist(object):
         """
         Assign the attraction for the specific day and time
         """
-        pass
+        # Add attraction to the locations
+        if day not in self.locations.keys():
+            self.locations[day] = [attraction]
+        else:
+            self.locations[day].append(attraction)
+
+        # Add the start time
+        if day not in self.start_times:
+            self.start_times[day] = {attraction.attraction_name : time}
+        else:
+            self.start_times[day][attraction.attraction_name] = time
         
 
 ### Parser to parse instance json file ###
