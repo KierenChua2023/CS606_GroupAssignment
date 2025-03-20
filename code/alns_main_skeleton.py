@@ -86,7 +86,7 @@ if __name__ == "__main__":
         # We then remove the days left using the remaining days
         del smjsp.tourist.touring_dict[i]
 
-        # We add the current day to the visited
+        # We add the current day events to the visited
         for loc in smjsp.tourist.locations[i]:
             smjsp.tourist.visited.append(loc)
 
