@@ -291,18 +291,19 @@ class Task(object):
 ### PSP state class ###
 # PSP state class. You could and should add your own helper functions to the class
 # But please keep the rest untouched!
-class JSP(State):
-    def __init__(self, tourists, attractions, weighting : list = [0.5, 0.5]):
-        """Initialize the PSP state
-        Args:
-            name::str
-                name of the instance
-            workers::[Worker]
-                workers of the instance
-            tasks::[Task]
-                tasks of the instance
+class SMJSP(State):
+    def __init__(self, 
+                 tourist : Tourist, 
+                 attractions : List[Attraction], 
+                 weighting : list = [0.5, 0.5]):
         """
-        self.tourists = tourists
+        Single Machine Job Scheduling Problem
+
+        Tourist : Tourist Class to plan for
+        Attractions : List of available Attraction
+        Weighting : The weighting between distances and attractiveness score
+        """
+        self.tourist = tourist
         self.attractions = attractions
         # the tasks assigned to each worker, eg. [worker1.tasks_assigned, worker2.tasks_assigned, ..., workerN.tasks_assigned]
         self.solution = []
@@ -326,6 +327,11 @@ class JSP(State):
         # // This should contain your construction heuristic for initial solution
         # // Use Worker class methods to check if assignment is valid
         # -----------------------------------------------------------
+
+        # We assign each must visit to the tourist first, before assigning the tasks
+        # Assign each task as early as possible, we randomly draw some tasks first
+        attr_to_choose = self.attractions
+
 
     def copy(self):
         return copy.deepcopy(self)

@@ -3,7 +3,7 @@ import argparse
 
 import numpy.random as rnd
 # from operators import destroy_1, repair_1
-from rcjsp import JSP, Parser
+from rcjsp import SMJSP, Parser
 from src.alns import ALNS
 from src.alns.criteria import *
 from src.helper import save_output
@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     sys.exit()
 
-    psp = JSP(parsed.tourists, parsed.attractions)
+    psp = SMJSP(parsed.tourists, parsed.attractions)
 
     # construct random initialized solution
     psp.random_initialize(seed)
