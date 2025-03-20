@@ -151,6 +151,20 @@ class Tourist(object):
             self.start_times[day] = {attraction.attraction_name : time}
         else:
             self.start_times[day][attraction.attraction_name] = time
+
+
+    def remove(self, attraction : Attraction) -> None:
+        """
+        Remove attraction from dictionaries
+        """
+        for key in self.locations.keys():
+            if attraction in self.locations[key]:
+                self.locations[key].remove(attraction)
+
+        # Remove the start time from the start times
+        for key in self.locations.keys():
+            if attraction.attraction_name in self.start_times[key].keys():
+                del self.start_times[key][attraction.attraction_name]
         
 
 ### Parser to parse instance json file ###
