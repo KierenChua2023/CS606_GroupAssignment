@@ -27,8 +27,9 @@ if __name__ == "__main__":
     random.seed(seed)
 
     # Add disruptions
-    attraction_disruptions_disruptions = [rainy_day, 
-                                            sick_day]
+    attraction_disruptions_disruptions = [rainy_day_attraction, 
+                                          sick_day_attraction, 
+                                          nothing_happens_attraction]
 
     # load data and random seed
     parsed = Parser(attraction_loc, tourist_loc)
