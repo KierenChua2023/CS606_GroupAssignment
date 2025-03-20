@@ -122,7 +122,6 @@ class Tourist(object):
             return False
         
         # 3 activities per day max
-        if attraction.
         
         # At least 2 hour breaks between activities 
         
